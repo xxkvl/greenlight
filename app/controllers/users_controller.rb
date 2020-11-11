@@ -83,6 +83,7 @@ class UsersController < ApplicationController
 
   # POST /u/:user_uid/edit
   def update
+    p user_params
     if session[:prev_url].present?
       path = session[:prev_url]
       session.delete(:prev_url)
@@ -210,7 +211,7 @@ class UsersController < ApplicationController
 
   def user_params
     params.require(:user).permit(:name, :email, :image, :password, :password_confirmation,
-      :new_password, :provider, :accepted_terms, :language)
+      :new_password, :provider, :accepted_terms, :language, :global_max_participants, :global_duration)
   end
 
   def send_registration_email

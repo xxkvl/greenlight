@@ -43,6 +43,11 @@ class RoomsController < ApplicationController
     # Check if the user has not exceeded the room limit
     return redirect_to current_user.main_room, flash: { alert: I18n.t("room.room_limit") } if room_limit_exceeded
 
+    return redirect_to current_user.main_room, flash: { alert: I18n.t("room.max_participants_limit") } if room_params[:max_participants] > 100
+
+    return redirect_to current_user.main_room, flash: { alert: I18n.t("room.global_max_participants_limit") } if global_max_participants_exceeded(room_params)
+    return redirect_to current_user.main_room, flash: { alert: I18n.t("room.global_duration_limit") } if global_duration_exceeded(room_params)
+
     # Create room
     @room = Room.new(name: room_params[:name], access_code: room_params[:access_code])
     @room.owner = current_user
@@ -174,6 +179,10 @@ class RoomsController < ApplicationController
     # Include the user's choices for the room settings
     @room_settings = JSON.parse(@room[:room_settings])
     opts[:mute_on_start] = room_setting_with_config("muteOnStart")
+
+    opts[:welcome] = room_setting_with_config("welcome")
+    opts[:max_participants] = room_setting_with_config("maxParticipants")
+    opts[:duration] = room_setting_with_config("duration")
     opts[:require_moderator_approval] = room_setting_with_config("requireModeratorApproval")
     opts[:record] = record_meeting
 
@@ -192,6 +201,9 @@ class RoomsController < ApplicationController
 
   # POST /:room_uid/update_settings
   def update_settings
+    return redirect_to current_user.main_room, flash: { alert: I18n.t("room.global_max_participants_limit") } if global_max_participants_exceeded(room_params)
+    return redirect_to current_user.main_room, flash: { alert: I18n.t("room.global_duration_limit") } if global_duration_exceeded(room_params)
+
     begin
       options = params[:room].nil? ? params : params[:room]
       raise "Room name can't be blank" if options[:name].blank?
@@ -336,6 +348,9 @@ class RoomsController < ApplicationController
       "anyoneCanStart": options[:anyone_can_start] == "1",
       "joinModerator": options[:all_join_moderator] == "1",
       "recording": options[:recording] == "1",
+      "welcome": options[:welcome],
+      "maxParticipants": options[:max_participants],
+      "duration": options[:duration]
     }
 
     room_settings.to_json
@@ -344,7 +359,7 @@ class RoomsController < ApplicationController
   def room_params
     params.require(:room).permit(:name, :auto_join, :mute_on_join, :access_code,
       :require_moderator_approval, :anyone_can_start, :all_join_moderator,
-      :recording, :presentation)
+      :recording, :presentation, :welcome, :duration, :max_participants)
   end
 
   # Find the room from the uid.
@@ -411,6 +426,31 @@ class RoomsController < ApplicationController
   end
   helper_method :room_limit_exceeded
 
+  def global_max_participants_exceeded(opts)
+    limit = current_user.global_max_participants
+    
+    user_participants = opts[:max_participants].to_i
+    current_user.rooms.each do |room|
+      user_participants = user_participants + (JSON.parse(room[:room_settings])[:max_participants].to_i || 0)
+    end
+
+    user_participants > limit
+  end
+  helper_method :global_max_participants_exceeded
+
+  def global_duration_exceeded(opts)
+    limit = current_user.global_duration
+
+    user_duration = opts[:duration].to_i
+    current_user.rooms.each do |room|
+      user_duration = user_duration + (JSON.parse(room[:room_settings])[:duration].to_i || 0)
+    end
+
+    user_duration > limit
+  end
+  helper_method :global_duration_exceeded
+
+
   def record_meeting
     # If the require consent setting is checked, then check the room setting, else, set to true
     if recording_consent_required?
@@ -439,6 +479,12 @@ class RoomsController < ApplicationController
       "Room Configuration Allow Any Start"
     when "recording"
       "Room Configuration Recording"
+    when "maxParticipants"
+      "Room Configuration Max Participants"
+    when "welcome"
+      "Room Configuration Welcome Message"
+    when "duration"
+      "Room Configuration Duration"
     end
 
     case @settings.get_value(config)

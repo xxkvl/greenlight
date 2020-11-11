@@ -76,6 +76,12 @@ class Setting < ApplicationRecord
       room_config_setting("all-join-moderator")
     when "Room Configuration Recording"
       room_config_setting("recording")
+    when "Room Configuration Max Participants"
+      room_config_setting("max-participants")
+    when "Room Configuration Welcome Message"
+      room_config_setting("welcome")
+    when "Room Configuration Duration"
+      room_config_setting("duration")
     end
   end
 
