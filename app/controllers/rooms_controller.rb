@@ -43,7 +43,9 @@ class RoomsController < ApplicationController
     # Check if the user has not exceeded the room limit
     return redirect_to current_user.main_room, flash: { alert: I18n.t("room.room_limit") } if room_limit_exceeded
 
-    if room_params[:max_participants] > 100
+    return redirect_to current_user.main_room, flash: { alert: I18n.t("room.create_room_error") } if room_params[:max_participants].to_i < 1 or room_params[:duration].to_i < 1
+
+    if room_params[:max_participants].to_i > 100
       return redirect_to current_user.main_room, flash: { alert: I18n.t("room.max_participants_limit") }
     end
 
@@ -207,6 +209,8 @@ class RoomsController < ApplicationController
 
   # POST /:room_uid/update_settings
   def update_settings
+    return redirect_to current_user.main_room, flash: { alert: I18n.t("room.create_room_error") } if room_params[:max_participants].to_i < 1 or room_params[:duration].to_i < 1
+
     if global_max_participants_exceeded(room_params)
       return redirect_to current_user.main_room, flash: { alert: I18n.t("room.global_max_participants_limit") }
     end
@@ -441,7 +445,7 @@ class RoomsController < ApplicationController
 
     user_participants = opts[:max_participants].to_i
     current_user.rooms.each do |room|
-      user_participants += (JSON.parse(room[:room_settings])[:max_participants].to_i || 0)
+      user_participants += (JSON.parse(room[:room_settings])["maxParticipants"].to_i || 0)
     end
 
     user_participants > limit
@@ -452,7 +456,7 @@ class RoomsController < ApplicationController
 
     user_duration = opts[:duration].to_i
     current_user.rooms.each do |room|
-      user_duration += (JSON.parse(room[:room_settings])[:duration].to_i || 0)
+      user_duration += (JSON.parse(room[:room_settings])["duration"].to_i || 0)
     end
 
     user_duration > limit
