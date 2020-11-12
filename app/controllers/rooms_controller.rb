@@ -43,10 +43,16 @@ class RoomsController < ApplicationController
     # Check if the user has not exceeded the room limit
     return redirect_to current_user.main_room, flash: { alert: I18n.t("room.room_limit") } if room_limit_exceeded
 
-    return redirect_to current_user.main_room, flash: { alert: I18n.t("room.max_participants_limit") } if room_params[:max_participants] > 100
+    if room_params[:max_participants] > 100
+      return redirect_to current_user.main_room, flash: { alert: I18n.t("room.max_participants_limit") }
+    end
 
-    return redirect_to current_user.main_room, flash: { alert: I18n.t("room.global_max_participants_limit") } if global_max_participants_exceeded(room_params)
-    return redirect_to current_user.main_room, flash: { alert: I18n.t("room.global_duration_limit") } if global_duration_exceeded(room_params)
+    if global_max_participants_exceeded(room_params)
+      return redirect_to current_user.main_room, flash: { alert: I18n.t("room.global_max_participants_limit") }
+    end
+    if global_duration_exceeded(room_params)
+      return redirect_to current_user.main_room, flash: { alert: I18n.t("room.global_duration_limit") }
+    end
 
     # Create room
     @room = Room.new(name: room_params[:name], access_code: room_params[:access_code])
@@ -201,8 +207,12 @@ class RoomsController < ApplicationController
 
   # POST /:room_uid/update_settings
   def update_settings
-    return redirect_to current_user.main_room, flash: { alert: I18n.t("room.global_max_participants_limit") } if global_max_participants_exceeded(room_params)
-    return redirect_to current_user.main_room, flash: { alert: I18n.t("room.global_duration_limit") } if global_duration_exceeded(room_params)
+    if global_max_participants_exceeded(room_params)
+      return redirect_to current_user.main_room, flash: { alert: I18n.t("room.global_max_participants_limit") }
+    end
+    if global_duration_exceeded(room_params)
+      return redirect_to current_user.main_room, flash: { alert: I18n.t("room.global_duration_limit") }
+    end
 
     begin
       options = params[:room].nil? ? params : params[:room]
@@ -428,28 +438,25 @@ class RoomsController < ApplicationController
 
   def global_max_participants_exceeded(opts)
     limit = current_user.global_max_participants
-    
+
     user_participants = opts[:max_participants].to_i
     current_user.rooms.each do |room|
-      user_participants = user_participants + (JSON.parse(room[:room_settings])[:max_participants].to_i || 0)
+      user_participants += (JSON.parse(room[:room_settings])[:max_participants].to_i || 0)
     end
 
     user_participants > limit
   end
-  helper_method :global_max_participants_exceeded
 
   def global_duration_exceeded(opts)
     limit = current_user.global_duration
 
     user_duration = opts[:duration].to_i
     current_user.rooms.each do |room|
-      user_duration = user_duration + (JSON.parse(room[:room_settings])[:duration].to_i || 0)
+      user_duration += (JSON.parse(room[:room_settings])[:duration].to_i || 0)
     end
 
     user_duration > limit
   end
-  helper_method :global_duration_exceeded
-
 
   def record_meeting
     # If the require consent setting is checked, then check the room setting, else, set to true

@@ -52,6 +52,7 @@ module RoomsHelper
       false
     end
   end
+
   def preupload_allowed?
     @settings.get_value("Preupload Presentation") == "true"
   end
