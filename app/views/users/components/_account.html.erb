@@ -61,12 +61,12 @@
 
     <% if current_user.role.get_permission("can_manage_users") %>
     <%= f.label :global_max_participants, t("settings.account.global_max_participants"), class: "form-label mt-5" %>
-      <%= f.text_field :global_max_participants, class: "form-control", placeholder: t("settings.account.global_max_participants")%>
+      <%= f.text_field :global_max_participants, class: "form-control", type: "number", min: 1, placeholder: t("settings.account.global_max_participants")%>
     <% end %>
 
     <% if current_user.role.get_permission("can_manage_users") %>
     <%= f.label :global_duration, t("settings.account.global_duration"), class: "form-label mt-5" %>
-      <%= f.text_field :global_duration, class: "form-control", placeholder: t("settings.account.global_duration")%>
+      <%= f.text_field :global_duration, class: "form-control", type: "number", min: 1, placeholder: t("settings.account.global_duration")%>
     <% end %>
 
 
