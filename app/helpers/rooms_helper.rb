@@ -42,6 +42,16 @@ module RoomsHelper
     @settings.get_value(name)
   end
 
+  def room_setting_with_config(name, field)
+    case @settings.get_value(name)
+    when "enabled"
+      true
+    when "optional"
+      @room_settings[field]
+    when "disabled"
+      false
+    end
+  end
   def preupload_allowed?
     @settings.get_value("Preupload Presentation") == "true"
   end

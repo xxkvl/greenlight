@@ -391,6 +391,9 @@ en:
       name_placeholder: Enter a room name...
       not_blank: Room name cannot be blank.
       title: Create New Room
+      max_participants_placeholder: Max Participants
+      duration_placeholder: Duration
+      welcome_placeholder: Welcome Message
     delete_account:
       confirm: Are you sure you want to delete this account?
       delete: I'm sure, delete this account.
@@ -569,6 +572,9 @@ en:
     preupload_remove_error: There was an error removing the room presentation
     recordings: Room Recordings
     room_limit: You have reached the maximum number of rooms allowed
+    max_participants_limit: Maximum number of users can't be more than 100
+    global_max_participants_limit: You reached max participants limit for your account. Upgrade your plan or remove some meeting rooms
+    global_duration_limit: You reached duration limit for your account. Upgrade your plan or remove some meeting rooms
     room_limit_exceeded: You have exceeded the number of rooms allowed. Please delete %{difference} room(s) to access this room.
     sessions: Sessions
     settings: Room Settings
@@ -596,6 +602,8 @@ en:
       subtitle: Update your Account Info
       title: Account Info
       reset_password: Reset user password
+      global_max_participants: Global Max Participants
+      global_duration: Global Duration
     delete:
       button: Yes, I would like to delete my account.
       disclaimer: If you choose to delete your account, it will <b>NOT</b> be recoverable. All information regarding your account, including settings, rooms, and recording will be removed.
