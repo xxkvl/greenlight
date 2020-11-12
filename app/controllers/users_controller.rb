@@ -83,7 +83,6 @@ class UsersController < ApplicationController
 
   # POST /u/:user_uid/edit
   def update
-    p user_params
     if session[:prev_url].present?
       path = session[:prev_url]
       session.delete(:prev_url)

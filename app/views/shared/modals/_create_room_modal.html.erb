@@ -77,7 +77,7 @@
             <% end %>
 
             <% mute = room_configuration("Room Configuration Mute On Join") %>
-            <% if mute != "disabled" %> 
+            <% if mute != "disabled" %>
               <label class="custom-switch pl-0 mt-3 mb-3 w-100 text-left d-inline-block <%= "enabled-setting" if mute == "enabled" %>">
                 <span class="custom-switch-description"><%= t("modal.room_settings.mute")%></span>
                 <%= f.check_box :mute_on_join, class: "custom-switch-input", data: { default: mute == "enabled" }, checked: false %>
