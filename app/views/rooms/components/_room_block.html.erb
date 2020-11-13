@@ -28,7 +28,7 @@
         </td>
         <td>
           <div>
-            <h4 contenteditable="false" class="m-0 force-text-normal room-name-text d-flex justify-content-between" ><span><%= room.name %></span><span><%= JSON.parse(room.room_settings)["maxParticipants"].to_s + "*" %></span></h4>
+            <h4 contenteditable="false" class="m-0 force-text-normal d-flex justify-content-between" ><span class="room-name-text"><%= room.name %></span><span><%= JSON.parse(room.room_settings)["maxParticipants"].to_s + "*" %></span></h4>
           </div>
           <div style="display: none">
             <input class="form-control input-sm w-100 h-4 room-name-editable" value="<%= room.name %>">
