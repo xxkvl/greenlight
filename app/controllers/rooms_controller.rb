@@ -455,9 +455,6 @@ class RoomsController < ApplicationController
     limit = current_user.global_duration
 
     user_duration = opts[:duration].to_i
-    current_user.rooms.each do |room|
-      user_duration += (JSON.parse(room[:room_settings])["duration"].to_i || 0)
-    end
 
     user_duration > limit
   end
