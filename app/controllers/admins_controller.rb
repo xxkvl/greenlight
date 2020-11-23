@@ -325,6 +325,13 @@ class AdminsController < ApplicationController
     redirect_to admin_roles_path
   end
 
+  def new_billing_plan
+    new_billing_plan = BillingPlan.new(params)
+    new_billing_plan.save!
+
+    return redirect_to admin_roles_path, flash: { alert: I18n.t("administrator.roles.invalid_create") } if new_role.nil?
+  end
+
   private
 
   def find_user
